@@ -373,7 +373,7 @@ class TestDrivers(testtools.TestCase):
         self.useFixture(ceph_driver)
 
         ceph_driver._exec(["ceph", "-c", os.getenv("CEPH_CONF"), "osd",
-                           "pool", "create", "gnocchi"], stdout=True),
+                           "pool", "create", "gnocchi"]),
 
         self.useFixture(gnocchi.GnocchiDriver(
             storage_url="ceph://%s" % os.getenv("CEPH_CONF"),
@@ -382,178 +382,178 @@ class TestDrivers(testtools.TestCase):
                          os.getenv("PIFPAF_URL"))
         r = requests.get("http://localhost:%d/" % port)
         self.assertEqual(200, r.status_code)
-    #
-    # @testtools.skipUnless(spawn.find_executable("pg_config"),
-    #                       "pg_config not found")
-    # @testtools.skipUnless(spawn.find_executable("gnocchi-api"),
-    #                       "Gnocchi not found")
-    # @testtools.skipUnless(spawn.find_executable("aodh-api"),
-    #                       "Aodh not found")
-    # def test_aodh_with_existing_db(self):
-    #     pg = self.useFixture(postgresql.PostgreSQLDriver(port=12345))
-    #     a = self.useFixture(aodh.AodhDriver(database_url=pg.url))
-    #     self.assertEqual("aodh://localhost:%d" % a.port,
-    #                      os.getenv("PIFPAF_URL"))
-    #     r = requests.get(os.getenv("PIFPAF_AODH_HTTP_URL"))
-    #     self.assertEqual(200, r.status_code)
-    #
-    # @testtools.skipUnless(spawn.find_executable("gnocchi-api"),
-    #                       "Gnocchi not found")
-    # @testtools.skipUnless(spawn.find_executable("aodh-api"),
-    #                       "Aodh not found")
-    # def test_aodh(self):
-    #     a = self.useFixture(aodh.AodhDriver())
-    #     self.assertEqual("aodh://localhost:%d" % a.port,
-    #                      os.getenv("PIFPAF_URL"))
-    #     r = requests.get(os.getenv("PIFPAF_AODH_HTTP_URL"))
-    #     self.assertEqual(200, r.status_code)
-    #
-    # @testtools.skipUnless(spawn.find_executable("keystone-manage"),
-    #                       "Keystone not found")
-    # def test_keystone(self):
-    #     self.skipTest(
-    #         "Keystone does not provide configuration files in venv")
-    #     a = self.useFixture(keystone.KeystoneDriver())
-    #     self.assertEqual("keystone://localhost:%d" % a.port,
-    #                      os.getenv("PIFPAF_URL"))
-    #     r = requests.get(os.getenv("PIFPAF_KEYSTONE_HTTP_URL"))
-    #     self.assertEqual(300, r.status_code)
-    #
-    # @testtools.skipUnless(spawn.find_executable("ceph-mon"),
-    #                       "Ceph Monitor not found")
-    # @testtools.skipUnless(spawn.find_executable("ceph-osd"),
-    #                       "Ceph OSD not found")
-    # @testtools.skipUnless(spawn.find_executable("ceph"),
-    #                       "Ceph client not found")
-    # def test_ceph(self):
-    #     tmp_rootdir = self._get_tmpdir_for_xattr()
-    #     a = self.useFixture(ceph.CephDriver(tmp_rootdir=tmp_rootdir))
-    #     self.assertEqual("ceph://localhost:%d" % a.port,
-    #                      os.getenv("PIFPAF_URL"))
-    #     self.assertIn("ceph.conf", os.getenv("CEPH_CONF"))
-    #     self.assertIn("ceph.conf", os.getenv("PIFPAF_CEPH_CONF"))
-    #
-    # @testtools.skipUnless(spawn.find_executable("rabbitmq-server"),
-    #                       "RabbitMQ not found")
-    # def test_rabbitmq(self):
-    #     a = self.useFixture(rabbitmq.RabbitMQDriver())
-    #     self.assertEqual("rabbit://%s:%s@localhost:%d//" % (a.username,
-    #                                                         a.password,
-    #                                                         a.port),
-    #                      os.getenv("PIFPAF_URL"))
-    #     self.assertEqual(a.nodename + "@localhost",
-    #                      os.getenv("PIFPAF_RABBITMQ_NODENAME"))
-    #     self.assertEqual(str(a.port), os.getenv("PIFPAF_RABBITMQ_PORT"))
-    #
-    # @testtools.skipUnless(spawn.find_executable("rabbitmq-server"),
-    #                       "RabbitMQ not found")
-    # def test_rabbitmq_cluster(self):
-    #     a = self.useFixture(rabbitmq.RabbitMQDriver(cluster=True, port=12345))
-    #     self.assertEqual(
-    #         "rabbit://%(user)s:%(pass)s@localhost:%(port1)d,"
-    #         "%(user)s:%(pass)s@localhost:%(port2)d,"
-    #         "%(user)s:%(pass)s@localhost:%(port3)d//" % {
-    #             "user": a.username,
-    #             "pass": a.password,
-    #             "port1": a.port,
-    #             "port2": a.port + 1,
-    #             "port3": a.port + 2},
-    #         os.getenv("PIFPAF_URL"))
-    #     self.assertEqual(a.nodename + "-1@localhost",
-    #                      os.getenv("PIFPAF_RABBITMQ_NODENAME"))
-    #     self.assertEqual(a.nodename + "-1@localhost",
-    #                      os.getenv("PIFPAF_RABBITMQ_NODENAME1"))
-    #     self.assertEqual(a.nodename + "-2@localhost",
-    #                      os.getenv("PIFPAF_RABBITMQ_NODENAME2"))
-    #     self.assertEqual(a.nodename + "-3@localhost",
-    #                      os.getenv("PIFPAF_RABBITMQ_NODENAME3"))
-    #     self.assertEqual(str(a.port), os.getenv("PIFPAF_RABBITMQ_PORT"))
-    #
-    #     a.kill_node(a.nodename + "-2@localhost")
-    #     a.stop_node(a.nodename + "-3@localhost")
-    #     a.start_node(a.nodename + "-3@localhost")
-    #     a.start_node(a.nodename + "-2@localhost")
-    #
-    # @testtools.skipUnless(spawn.find_executable("couchdb"),
-    #                       "CouchDB not found")
-    # def test_couchdb(self):
-    #     port = 6984
-    #     self.useFixture(couchdb.CouchDBDriver(port=port))
-    #     self.assertEqual("couchdb://localhost:%d" % port,
-    #                      os.getenv("PIFPAF_URL"))
-    #     r = requests.get("http://localhost:%d/" % port)
-    #     self.assertEqual(r.json()["couchdb"], "Welcome")
-    #
-    # @testtools.skipUnless(spawn.find_executable("artemis"),
-    #                       "Artemis not found")
-    # def test_artemis(self):
-    #     self.useFixture(artemis.ArtemisDriver(port=54321))
-    #     self.assertEqual("amqp://localhost:54321",
-    #                      os.getenv("PIFPAF_URL"))
-    #     self.assertEqual("54321", os.getenv("PIFPAF_ARTEMIS_PORT"))
-    #     self.assertEqual("amqp://localhost:54321",
-    #                      os.getenv("PIFPAF_ARTEMIS_URL"))
-    #
-    # @testtools.skipUnless(spawn.find_executable("qdrouterd"),
-    #                       "Qdrouterd not found")
-    # def test_qdrouterd(self):
-    #     a = self.useFixture(qdrouterd.QdrouterdDriver(port=54321))
-    #     self.assertEqual("amqp://%s:%s@localhost:54321" % (a.username,
-    #                                                        a.password),
-    #                      os.getenv("PIFPAF_URL"))
-    #     self.assertEqual("54321", os.getenv("PIFPAF_QDROUTERD_PORT"))
-    #     self.assertEqual("amqp://localhost:54321",
-    #                      os.getenv("PIFPAF_QDROUTERD_URL"))
-    #
-    # @testtools.skipUnless(spawn.find_executable("kafka-server-start.sh"),
-    #                       "Kafka not found")
-    # def test_kafka(self):
-    #     a = self.useFixture(kafka.KafkaDriver(port=54321,
-    #                                           zookeeper_port=12345))
-    #     self.assertEqual("kafka://localhost:54321",
-    #                      os.getenv("PIFPAF_URL"))
-    #     self.assertEqual(12345, a.zookeeper_port)
-    #     self.assertEqual("54321", os.getenv("PIFPAF_KAFKA_PORT"))
-    #     self.assertEqual("PLAINTEXT", os.getenv("PIFPAF_KAFKA_PROTOCOL"))
-    #     self.assertEqual("PLAINTEXT://localhost:54321",
-    #                      os.getenv("PIFPAF_KAFKA_URL"))
-    #
-    # @testtools.skipUnless(spawn.find_executable("swift-proxy-server"),
-    #                       "Swift not found")
-    # def test_swift(self):
-    #     tmp_rootdir = self._get_tmpdir_for_xattr()
-    #     a = self.useFixture(swift.SwiftDriver(tmp_rootdir=tmp_rootdir))
-    #     self.assertEqual("http://localhost:8080/auth/v1.0",
-    #                      os.getenv("PIFPAF_SWIFT_AUTH_URL"))
-    #     self.assertEqual(8080, a.port)
-    #     self.assertEqual("8080", os.getenv("PIFPAF_SWIFT_PORT"))
-    #     self.assertEqual("test:tester", os.getenv("PIFPAF_SWIFT_USERNAME"))
-    #     self.assertEqual("testing", os.getenv("PIFPAF_SWIFT_PASSWORD"))
-    #     self.assertEqual(
-    #         "swift://test%3Atester:testing@localhost:8080/auth/v1.0",
-    #         os.getenv("PIFPAF_SWIFT_URL"))
-    #     self.assertEqual(
-    #         "swift://test%3Atester:testing@localhost:8080/auth/v1.0",
-    #         os.getenv("PIFPAF_URL"))
-    #
-    # @testtools.skipUnless(testtools.try_import('httpbin'),
-    #                       "httpbin not found")
-    # def test_httpbin(self):
-    #     port = 6666
-    #     a = self.useFixture(httpbin.HttpBinDriver(port=port))
-    #     self.assertEqual(port, a.port)
-    #     r = requests.get("http://127.0.0.1:%d/ip" % port)
-    #     self.assertEqual(r.status_code, 200)
-    #     self.assertEqual(r.json()["origin"], "127.0.0.1")
-    #
-    # def _get_tmpdir_for_xattr(self):
-    #     tmp_rootdir = os.getenv("TMPDIR_FOR_XATTR")
-    #     # NOTE(sileht): Don't skip test if user have explicitly set a directory
-    #     if not tmp_rootdir:
-    #         try:
-    #             d = drivers.Driver(tmp_rootdir=tmp_rootdir)
-    #             self.useFixture(d)
-    #             d._ensure_xattr_support()
-    #         except RuntimeError as e:
-    #             self.skipTest(str(e))
-    #     return tmp_rootdir
+
+    @testtools.skipUnless(spawn.find_executable("pg_config"),
+                          "pg_config not found")
+    @testtools.skipUnless(spawn.find_executable("gnocchi-api"),
+                          "Gnocchi not found")
+    @testtools.skipUnless(spawn.find_executable("aodh-api"),
+                          "Aodh not found")
+    def test_aodh_with_existing_db(self):
+        pg = self.useFixture(postgresql.PostgreSQLDriver(port=12345))
+        a = self.useFixture(aodh.AodhDriver(database_url=pg.url))
+        self.assertEqual("aodh://localhost:%d" % a.port,
+                         os.getenv("PIFPAF_URL"))
+        r = requests.get(os.getenv("PIFPAF_AODH_HTTP_URL"))
+        self.assertEqual(200, r.status_code)
+
+    @testtools.skipUnless(spawn.find_executable("gnocchi-api"),
+                          "Gnocchi not found")
+    @testtools.skipUnless(spawn.find_executable("aodh-api"),
+                          "Aodh not found")
+    def test_aodh(self):
+        a = self.useFixture(aodh.AodhDriver())
+        self.assertEqual("aodh://localhost:%d" % a.port,
+                         os.getenv("PIFPAF_URL"))
+        r = requests.get(os.getenv("PIFPAF_AODH_HTTP_URL"))
+        self.assertEqual(200, r.status_code)
+
+    @testtools.skipUnless(spawn.find_executable("keystone-manage"),
+                          "Keystone not found")
+    def test_keystone(self):
+        self.skipTest(
+            "Keystone does not provide configuration files in venv")
+        a = self.useFixture(keystone.KeystoneDriver())
+        self.assertEqual("keystone://localhost:%d" % a.port,
+                         os.getenv("PIFPAF_URL"))
+        r = requests.get(os.getenv("PIFPAF_KEYSTONE_HTTP_URL"))
+        self.assertEqual(300, r.status_code)
+
+    @testtools.skipUnless(spawn.find_executable("ceph-mon"),
+                          "Ceph Monitor not found")
+    @testtools.skipUnless(spawn.find_executable("ceph-osd"),
+                          "Ceph OSD not found")
+    @testtools.skipUnless(spawn.find_executable("ceph"),
+                          "Ceph client not found")
+    def test_ceph(self):
+        tmp_rootdir = self._get_tmpdir_for_xattr()
+        a = self.useFixture(ceph.CephDriver(tmp_rootdir=tmp_rootdir))
+        self.assertEqual("ceph://localhost:%d" % a.port,
+                         os.getenv("PIFPAF_URL"))
+        self.assertIn("ceph.conf", os.getenv("CEPH_CONF"))
+        self.assertIn("ceph.conf", os.getenv("PIFPAF_CEPH_CONF"))
+
+    @testtools.skipUnless(spawn.find_executable("rabbitmq-server"),
+                          "RabbitMQ not found")
+    def test_rabbitmq(self):
+        a = self.useFixture(rabbitmq.RabbitMQDriver())
+        self.assertEqual("rabbit://%s:%s@localhost:%d//" % (a.username,
+                                                            a.password,
+                                                            a.port),
+                         os.getenv("PIFPAF_URL"))
+        self.assertEqual(a.nodename + "@localhost",
+                         os.getenv("PIFPAF_RABBITMQ_NODENAME"))
+        self.assertEqual(str(a.port), os.getenv("PIFPAF_RABBITMQ_PORT"))
+
+    @testtools.skipUnless(spawn.find_executable("rabbitmq-server"),
+                          "RabbitMQ not found")
+    def test_rabbitmq_cluster(self):
+        a = self.useFixture(rabbitmq.RabbitMQDriver(cluster=True, port=12345))
+        self.assertEqual(
+            "rabbit://%(user)s:%(pass)s@localhost:%(port1)d,"
+            "%(user)s:%(pass)s@localhost:%(port2)d,"
+            "%(user)s:%(pass)s@localhost:%(port3)d//" % {
+                "user": a.username,
+                "pass": a.password,
+                "port1": a.port,
+                "port2": a.port + 1,
+                "port3": a.port + 2},
+            os.getenv("PIFPAF_URL"))
+        self.assertEqual(a.nodename + "-1@localhost",
+                         os.getenv("PIFPAF_RABBITMQ_NODENAME"))
+        self.assertEqual(a.nodename + "-1@localhost",
+                         os.getenv("PIFPAF_RABBITMQ_NODENAME1"))
+        self.assertEqual(a.nodename + "-2@localhost",
+                         os.getenv("PIFPAF_RABBITMQ_NODENAME2"))
+        self.assertEqual(a.nodename + "-3@localhost",
+                         os.getenv("PIFPAF_RABBITMQ_NODENAME3"))
+        self.assertEqual(str(a.port), os.getenv("PIFPAF_RABBITMQ_PORT"))
+
+        a.kill_node(a.nodename + "-2@localhost")
+        a.stop_node(a.nodename + "-3@localhost")
+        a.start_node(a.nodename + "-3@localhost")
+        a.start_node(a.nodename + "-2@localhost")
+
+    @testtools.skipUnless(spawn.find_executable("couchdb"),
+                          "CouchDB not found")
+    def test_couchdb(self):
+        port = 6984
+        self.useFixture(couchdb.CouchDBDriver(port=port))
+        self.assertEqual("couchdb://localhost:%d" % port,
+                         os.getenv("PIFPAF_URL"))
+        r = requests.get("http://localhost:%d/" % port)
+        self.assertEqual(r.json()["couchdb"], "Welcome")
+
+    @testtools.skipUnless(spawn.find_executable("artemis"),
+                          "Artemis not found")
+    def test_artemis(self):
+        self.useFixture(artemis.ArtemisDriver(port=54321))
+        self.assertEqual("amqp://localhost:54321",
+                         os.getenv("PIFPAF_URL"))
+        self.assertEqual("54321", os.getenv("PIFPAF_ARTEMIS_PORT"))
+        self.assertEqual("amqp://localhost:54321",
+                         os.getenv("PIFPAF_ARTEMIS_URL"))
+
+    @testtools.skipUnless(spawn.find_executable("qdrouterd"),
+                          "Qdrouterd not found")
+    def test_qdrouterd(self):
+        a = self.useFixture(qdrouterd.QdrouterdDriver(port=54321))
+        self.assertEqual("amqp://%s:%s@localhost:54321" % (a.username,
+                                                           a.password),
+                         os.getenv("PIFPAF_URL"))
+        self.assertEqual("54321", os.getenv("PIFPAF_QDROUTERD_PORT"))
+        self.assertEqual("amqp://localhost:54321",
+                         os.getenv("PIFPAF_QDROUTERD_URL"))
+
+    @testtools.skipUnless(spawn.find_executable("kafka-server-start.sh"),
+                          "Kafka not found")
+    def test_kafka(self):
+        a = self.useFixture(kafka.KafkaDriver(port=54321,
+                                              zookeeper_port=12345))
+        self.assertEqual("kafka://localhost:54321",
+                         os.getenv("PIFPAF_URL"))
+        self.assertEqual(12345, a.zookeeper_port)
+        self.assertEqual("54321", os.getenv("PIFPAF_KAFKA_PORT"))
+        self.assertEqual("PLAINTEXT", os.getenv("PIFPAF_KAFKA_PROTOCOL"))
+        self.assertEqual("PLAINTEXT://localhost:54321",
+                         os.getenv("PIFPAF_KAFKA_URL"))
+
+    @testtools.skipUnless(spawn.find_executable("swift-proxy-server"),
+                          "Swift not found")
+    def test_swift(self):
+        tmp_rootdir = self._get_tmpdir_for_xattr()
+        a = self.useFixture(swift.SwiftDriver(tmp_rootdir=tmp_rootdir))
+        self.assertEqual("http://localhost:8080/auth/v1.0",
+                         os.getenv("PIFPAF_SWIFT_AUTH_URL"))
+        self.assertEqual(8080, a.port)
+        self.assertEqual("8080", os.getenv("PIFPAF_SWIFT_PORT"))
+        self.assertEqual("test:tester", os.getenv("PIFPAF_SWIFT_USERNAME"))
+        self.assertEqual("testing", os.getenv("PIFPAF_SWIFT_PASSWORD"))
+        self.assertEqual(
+            "swift://test%3Atester:testing@localhost:8080/auth/v1.0",
+            os.getenv("PIFPAF_SWIFT_URL"))
+        self.assertEqual(
+            "swift://test%3Atester:testing@localhost:8080/auth/v1.0",
+            os.getenv("PIFPAF_URL"))
+
+    @testtools.skipUnless(testtools.try_import('httpbin'),
+                          "httpbin not found")
+    def test_httpbin(self):
+        port = 6666
+        a = self.useFixture(httpbin.HttpBinDriver(port=port))
+        self.assertEqual(port, a.port)
+        r = requests.get("http://127.0.0.1:%d/ip" % port)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["origin"], "127.0.0.1")
+
+    def _get_tmpdir_for_xattr(self):
+        tmp_rootdir = os.getenv("TMPDIR_FOR_XATTR")
+        # NOTE(sileht): Don't skip test if user have explicitly set a directory
+        if not tmp_rootdir:
+            try:
+                d = drivers.Driver(tmp_rootdir=tmp_rootdir)
+                self.useFixture(d)
+                d._ensure_xattr_support()
+            except RuntimeError as e:
+                self.skipTest(str(e))
+        return tmp_rootdir
