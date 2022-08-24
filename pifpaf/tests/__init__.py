@@ -1,4 +1,8 @@
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
 print("called")
+try:
+    logging.basicConfig(level=logging.DEBUG)
+except Exception as e:
+    print(e)
+    raise
