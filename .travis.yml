@@ -34,7 +34,7 @@ install:
   - pip install tox-travis .[test,ceph]
   - mkdir tmpxattr
   - tox -epy38 --notest
-script: TMPDIR_FOR_XATTR=$(pwd)/tmpxattr tox -v -- $PIFPAF_TESTS --debug
+script: TMPDIR_FOR_XATTR=$(pwd)/tmpxattr tox -v -- $PIFPAF_TESTS --debug --subunit
 
 deploy:
   provider: pypi
