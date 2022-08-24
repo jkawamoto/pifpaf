@@ -134,7 +134,7 @@ class Driver(fixtures.Fixture):
         data = os.fsdecode(data)
         LOG.debug("%s[%d] output: %s", appname, pid, data.rstrip())
 
-    def _exec(self, command, stdout=True, ignore_failure=False,
+    def _exec(self, command, stdout=False, ignore_failure=False,
               stdin=None, wait_for_line=None, wait_for_port=None,
               path=[], env=None,
               forbidden_line_after_start=None,
