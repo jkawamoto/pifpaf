@@ -16,6 +16,8 @@
 import logging
 import os
 import socket
+import threading
+import time
 from distutils import spawn
 
 import fixtures
@@ -373,23 +375,27 @@ class TestDrivers(testtools.TestCase):
     @testtools.skipUnless(spawn.find_executable("ceph"),
                           "Ceph client not found")
     def test_gnocchi_with_existing_ceph(self):
-        logging.debug("a")
+        def timeout():
+            time.sleep(60*8)
+            self.fail("timeout")
+        threading.Thread(target=timeout).start()
+
         port = gnocchi.GnocchiDriver.DEFAULT_PORT + 10
         tmp_rootdir = self._get_tmpdir_for_xattr()
-        logging.debug("b")
         ceph_driver = ceph.CephDriver(tmp_rootdir=tmp_rootdir)
         self.useFixture(ceph_driver)
 
-        logging.debug("c")
+        logging.info("exec ceph")
         ceph_driver._exec(["ceph", "-c", os.getenv("CEPH_CONF"), "osd",
                            "pool", "create", "gnocchi"], stdout=True),
-        logging.debug("d")
 
+        logging.info("GnocchiDriver")
         self.useFixture(gnocchi.GnocchiDriver(
             storage_url="ceph://%s" % os.getenv("CEPH_CONF"),
             port=port))
         self.assertEqual("gnocchi://localhost:%d" % port,
                          os.getenv("PIFPAF_URL"))
+        logging.info("req")
         r = requests.get("http://localhost:%d/" % port)
         self.assertEqual(200, r.status_code)
 
