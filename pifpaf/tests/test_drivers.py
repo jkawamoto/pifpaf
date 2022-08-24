@@ -66,6 +66,8 @@ unkillable = os.path.join(
     os.path.dirname(os.path.realpath(__file__)),
     "unkillable.py")
 
+logging.basicConfig(level=logging.DEBUG)
+
 
 class TestDrivers(testtools.TestCase):
     def setUp(self):
